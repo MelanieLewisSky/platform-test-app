@@ -1,4 +1,5 @@
 import {
+  ASStatus,
   SystemDeviceInformation,
   SystemInputs
 } from "../types/Types";
@@ -9,5 +10,7 @@ export interface IASLite {
 
   getSystemInputs(): Promise<SystemInputs>;
 
-  playersWatchInput(playerId: number, portId: string): Promise<void>;
+  playersWatchInput(playerId: number, portId: string): Promise<ASStatus>;
+
+  playersStop(playerId: number): Promise<ASStatus>;
 }

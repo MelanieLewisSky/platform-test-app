@@ -29,6 +29,8 @@ export class Launch extends Lightning.Component {
         mountX: 0.5,
         y: 400,
         w: 800,
+        rect: true,
+        color: 0xff000000,
         ModelNumber: {
           y: 0,
           ModelNumberLabel: {
@@ -39,7 +41,7 @@ export class Launch extends Lightning.Component {
           },
           ModelNumberText: {
             type: SkyText,
-            x: 300,
+            x: 330,
             text: this.bindProp("modelNumber"),
           },
         },
@@ -53,7 +55,7 @@ export class Launch extends Lightning.Component {
           },
           VersionNumberText: {
             type: SkyText,
-            x: 300,
+            x: 330,
             text: this.bindProp("versionNumber"),
           },
         },
@@ -67,7 +69,7 @@ export class Launch extends Lightning.Component {
           },
           ASVersionText: {
             type: SkyText,
-            x: 300,
+            x: 330,
             text: this.bindProp("asVersion"),
           },
         },
@@ -81,7 +83,7 @@ export class Launch extends Lightning.Component {
           },
           SerialNumberText: {
             type: SkyText,
-            x: 300,
+            x: 330,
             text: this.bindProp("serialNumber"),
           },
         },
@@ -95,7 +97,7 @@ export class Launch extends Lightning.Component {
           },
           IPAddressText: {
             type: SkyText,
-            x: 300,
+            x: 330,
             text: this.bindProp("ipAddress"),
           },
         },
