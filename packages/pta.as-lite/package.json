@@ -1,0 +1,41 @@
+{
+  "name": "@pta/as-lite",
+  "version": "0.0.1",
+  "description": "A wrapper that handles AS system settings",
+  "homepage": "https://github.com/sky-uk/platform-test-app#readme",
+  "license": "ISC",
+  "type": "module",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://npm.pkg.github.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sky-uk/platform-test-app.git"
+  },
+  "scripts": {
+    "test": "jest --silent --colors",
+    "test:coverage": "jest --silent --colors --coverage",
+    "build": "yarn prod:compile",
+    "build:dev": "yarn dev:compile",
+    "prod:compile": "rollup -c",
+    "dev:compile": "rollup -c rollup.config.dev.js",
+    "clean": "rimraf dist coverage",
+    "lint": "eslint --ext .ts ./src --color"
+  },
+  "bugs": {
+    "url": "https://github.com/sky-uk/platform-test-app/issues"
+  },
+  "dependencies": {
+    "axios": "^0.27.0",
+    "eventemitter3": "^5.0.0"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.49.0",
+    "@typescript-eslint/parser": "^5.49.0",
+    "rimraf": "^4.1.2",
+    "rollup": "^3.15.0"
+  }
+}

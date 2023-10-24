@@ -1,0 +1,33 @@
+{
+  "appSettings": {
+    "version": "0.0.1",
+    "stage": {
+      "w": 1920,
+      "h": 1080,
+      "clearColor": "0x00000000",
+      "useImageWorker": true,
+      "canvas2d": false,
+      "pauseRafLoopOnIdle": true
+    },
+    "debug": false,
+    "keys": {
+      "13": "Enter",
+      "27": "Back",
+      "36": "Home",
+      "106": "ToggleMute",
+      "179": "MediaPlay"
+    },
+    "castDisplay": 2
+  },
+  "platformSettings": {
+    "path": "./static",
+    "log": true,
+    "showVersion": false,
+    "inspector": false,
+    "router": {
+      "lazyCreate": true,
+      "lazyDestroy": true,
+      "destroyOnHistoryBack": true
+    }
+  }
+}

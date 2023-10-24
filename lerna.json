@@ -1,0 +1,27 @@
+{
+  "npmClient": "yarn",
+  "useWorkspaces": true,
+  "version": "independent",
+  "command": {
+    "run": {
+      "stream": true
+    },
+    "version": {
+      "message": "chore: lerna",
+      "yes": true,
+      "conventionalCommits": true,
+      "createRelease": "github",
+      "changelogPreset": "angular",
+      "granularPathspec": false
+    },
+    "publish": {
+      "ignoreChanges": ["*.md", ".test", ".snap"],
+      "message": "chore: lerna",
+      "registry": "npm.pkg.github.com",
+      "yes": true,
+      "conventionalCommits": true
+    }
+  },
+  "ignoreChanges": ["**/test/**"]
+}
+

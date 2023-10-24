@@ -1,0 +1,6 @@
+{
+  "name": "platform-test-app",
+  "identifier": "com.sky.platform-test-app",
+  "version": "1.0.0",
+  "icon": "./static/icon.png"
+}

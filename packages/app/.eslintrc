@@ -1,0 +1,27 @@
+{
+  "parserOptions": {
+    "allowImportExportEverywhere": true
+  },
+  "plugins": ["jest", "prettier"],
+  "extends": ["eslint:recommended", "prettier"],
+  "globals": {
+    "AAMPMediaPlayer": "readonly",
+    "jest": "readonly"
+  },
+  "rules": {
+    //   "prettier/prettier": "off",
+    "quotes": ["warn", "double", { "avoidEscape": true }]
+    //   "semi": ["error", "always"],
+    // "no-unused-vars": "error"
+    //   "comma-dangle": [
+    //     "error",
+    //     {
+    //       "arrays": "always-multiline",
+    //       "objects": "always-multiline",
+    //       "imports": "always-multiline",
+    //       "exports": "never",
+    //       "functions": "never"
+    //     }
+    //   ]
+  }
+}
