@@ -1,0 +1,24 @@
+<html>
+  <body>
+    <script language="javascript" src="./deeplink.js"></script>
+    <script language="javascript" src="../tmp/launch.js"></script>
+    {{#dynamicUrl}}
+    <script language="javascript" src="./cherry-app-release-process.js"></script>
+    <script language="javascript">
+      getUrl("{{groupId}}")
+        .then((url) => {
+          loadApp(url);
+        })
+        .catch((error) => {
+          console.error(error);
+          document.write(error.message);
+        });
+    </script>
+    {{/dynamicUrl}}
+    {{#fixedUrl}}
+    <script language="javascript">
+      loadApp("{{{url}}}");
+    </script>
+    {{/fixedUrl}}
+  </body>
+</html>

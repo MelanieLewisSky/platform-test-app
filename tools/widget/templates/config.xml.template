@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<widget xmlns="http://www.bskyb.com/ns/widgets" version="2.0">
+    <name short="{{appId}}" version="{{widgetVersion}}">Platform Test App</name>
+    <icon src="icon.png" type="image/png" />
+    <content src="." type="application/html">
+        <platformFilters>
+            <platformVariant name="RDK-PANEL" />
+        </platformFilters>
+    </content>
+    <capabilities>
+        <capability name="local-services-1" />
+        <capability name="wan-lan" />
+        <capability name="storage" />
+        <capability name="private-storage">1</capability>
+        <capability name="keymapping">Option,Voice,Search,Channel+,Channel-</capability>
+        <capability name="refresh-rate-60hz" />
+        <capability name="drm-store" />
+        <capability name="drm-type">com.widevine.alpha</capability>
+        <capability name="pin-management">readwrite</capability>
+        <capability name="thunder" />
+        <capability name="as-player" />
+        <capability name="memory-intensive" />
+        {{#capabilities}}
+        <capability name="{{name}}">{{value}}</capability>
+        {{/capabilities}}
+    </capabilities>
+    <parentalControl>true</parentalControl>
+</widget>

@@ -1,0 +1,33 @@
+{
+  "name": "widget",
+  "version": "1.0.0",
+  "description": "Widget for the Platform Test App lightning project",
+  "main": "index.js",
+  "scripts": {
+    "build-widget": "node scripts/processParameters.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sky-uk/platform-test-app.git"
+  },
+  "keywords": [
+    "widget",
+    "pta"
+  ],
+  "author": "WTE Squad",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sky-uk/platform-test-app/issues"
+  },
+  "homepage": "https://github.com/sky-uk/platform-test-app#readme",
+  "devDependencies": {
+    "command-line-args": "^5.2.1",
+    "fs": "^0.0.1-security",
+    "husky": "^8.0.1",
+    "jszip": "^3.10.1",
+    "mkdirp": "^1.0.4",
+    "mustache": "^4.2.0",
+    "prettier": "^2.7.1",
+    "prompts": "^2.4.2"
+  }
+}
