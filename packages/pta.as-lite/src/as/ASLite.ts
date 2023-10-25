@@ -57,6 +57,21 @@ export class ASLite implements IASLite {
     }
   }
 
+  async playersWatchLive(playerId: number, serviceKey: string): Promise<ASStatus> {
+    try {
+      const response = await axios.request({
+        method: 'post',
+        baseURL: BASE_URL,
+        url: `/players/${playerId}/viper/action/watchstream?sk=${serviceKey}`,
+      });
+
+      return response;
+    } catch (e) {
+      const error = e as ASError;
+      return error.response;
+    }
+  }
+
   async playersStop(playerId: number): Promise<ASStatus> {
     try {
       const response = await axios.request({

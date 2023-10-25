@@ -12,5 +12,7 @@ export interface IASLite {
 
   playersWatchInput(playerId: number, portId: string): Promise<ASStatus>;
 
+  playersWatchLive(playerId: number, serviceKey: string): Promise<ASStatus>;
+
   playersStop(playerId: number): Promise<ASStatus>;
 }
