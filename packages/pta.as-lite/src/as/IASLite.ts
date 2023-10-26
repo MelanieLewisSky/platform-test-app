@@ -10,6 +10,10 @@ export interface IASLite {
 
   getSystemInputs(): Promise<SystemInputs>;
 
+  getSystemSetting(setting: string): Promise<string>;
+
+  setSystemSetting(setting: string, value: string|number): Promise<ASStatus>;
+
   playersWatchInput(playerId: number, portId: string): Promise<ASStatus>;
 
   playersWatchLive(playerId: number, serviceKey: string): Promise<ASStatus>;

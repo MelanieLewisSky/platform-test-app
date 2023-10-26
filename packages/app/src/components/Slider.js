@@ -1,5 +1,8 @@
 import { Lightning, Utils } from "@lightningjs/sdk";
+import { logger } from "@sky-uk/lightning-logger";
 import { full } from "../utils/size";
+
+const FILE_NAME = "Slider.js";
 
 const BUTTON_SIZE = 32;
 const HEIGHT = 32;
@@ -86,11 +89,13 @@ export class Slider extends Lightning.Component {
   }
 
   _handleLeft() {
+    logger.debug(FILE_NAME, "_handleLeft");
     this.setValue(this.value - this.step, true);
     return true;
   }
 
   _handleRight() {
+    logger.debug(FILE_NAME, "_handleRight");
     this.setValue(this.value + this.step, true);
     return true;
   }

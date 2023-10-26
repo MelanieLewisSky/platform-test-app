@@ -1,7 +1,8 @@
-import { Lightning, Settings, Router } from "@lightningjs/sdk";
+import { Lightning, Settings } from "@lightningjs/sdk";
 import { logger } from "@sky-uk/lightning-logger";
 import { TextButton } from "@sky-uk/lightning-tiles-ui";
 import { getASLite } from "@pta/as-lite";
+import { AudioBalance } from "../components";
 import { half } from "../utils/size";
 import { TextStyles } from "../constants";
 
@@ -20,7 +21,7 @@ export class HDMITest extends Lightning.Component {
         mountX: 0.5,
         rect: true,
         color: 0xaa000000,
-        w: 1100,
+        w: 1300,
         h: 550,
         Title: {
           x: half,
@@ -31,6 +32,15 @@ export class HDMITest extends Lightning.Component {
             text: "HDMI Tests",
             textAlign: "center",
           },
+        },
+        ID: {
+          x: 1100,
+          y: 20,
+          text: {
+            ...TextStyles.subtitle,
+            text: this.bindProp("idText"),
+            textAlign: "left",
+          }
         },
         Instruction: {
           x: half,
@@ -66,11 +76,12 @@ export class HDMITest extends Lightning.Component {
         rect: true,
         x: 40,
         y: 900,
-        w: 200,
-        h: 90,
+        w: 360,
+        h: 120,
         color: 0xaa000000,
         HDM1: {
-          y: 0,
+          x: 10,
+          y: 10,
           HDM1Label: {
             text: {
               ...TextStyles.subtitle,
@@ -86,7 +97,8 @@ export class HDMITest extends Lightning.Component {
           },
         },
         HDM2: {
-          y: 30,
+          x: 10,
+          y: 40,
           HDM2Label: {
             text: {
               ...TextStyles.subtitle,
@@ -102,7 +114,8 @@ export class HDMITest extends Lightning.Component {
           },
         },
         HDM3: {
-          y: 60,
+          x: 10,
+          y: 70,
           HDM1Label: {
             text: {
               ...TextStyles.subtitle,
@@ -117,6 +130,20 @@ export class HDMITest extends Lightning.Component {
             }
           },
         },
+      },
+      AudioBalanceOverlay: {
+        type: AudioBalance,
+        signals: {
+          onAudioBalanceChanged: "_onAudioBalanceControlChanged",
+        },
+        mount: 0.5,
+        x: half,
+        y: 800,
+        w: AudioBalance.WIDTH,
+        h: AudioBalance.HEIGHT,
+        rect: true,
+        color: 0xff000000,
+        visible: false,
       },
       ErrorOverlay: {
         zIndex: 20,
@@ -226,8 +253,23 @@ export class HDMITest extends Lightning.Component {
           }
         }
 
-        _getFocused() {
-          return this.tag("ContinueButton") || this;
+        static _states() {
+          return [
+            class DefaultTestState extends TestState {
+              _getFocused() {
+                return this.tag("ContinueButton");
+              }
+            },
+            class BalanceTestState extends TestState {
+              _getFocused() {
+                return this.tag("AudioBalanceOverlay");
+              }
+
+              _handleEnter() {
+                this._setState("TestState.DefaultTestState");
+              }
+            }
+          ]
         }
       },
       class ErrorState extends this {
@@ -240,7 +282,7 @@ export class HDMITest extends Lightning.Component {
         }
 
         _handleEnter() {
-          this._setState("TestState");
+          this._setState(this._previousState);
         }
 
         _getFocused() {
@@ -266,94 +308,215 @@ export class HDMITest extends Lightning.Component {
   _construct() {
     this.testSteps = [
       {
+        id: "HDMI-T1",
         question: "Do the HDMI states show that nothing is connected?",
       },
       {
         instruction: "Please connect a 1080P60 source to HDMI1 and play it",
       },
       {
+        id: "HDMI-T2",
         question: "Does only HDMI1 show as connected?",
-        preTest: this.connectHDMI1ToPlayer1.bind(this),
+        preTest: async () => {
+          const response = await this._asLite.playersWatchInput(1, "HDMI1");
+          this._statusCheck(response);
+          this._showPlayer(this._player1, true);
+        },
       },
       {
-        question: "Is the HDMI input visible full screen?",
+        id: "HDMI-T3",
+        question: "Is the HDMI1 input visible full screen?",
       },
       {
-        question: "Can you hear the audio from the HDMI input?",
+        id: "HDMI-T4",
+        question: "Can you hear the audio from the HDMI1 input?",
       },
       {
-        question: "Do the volume controls change the volume of the HDMI input?",
+        id: "HDMI-T5",
+        question: "Do the volume controls change the volume of the HDMI1 input?",
       },
       {
+        id: "HDMI-T6",
         question: "Is the HDMI input no longer visible?",
-        preTest: this.stopPlayer1.bind(this),
+        preTest: async () => {
+          this._showPlayer(this._player1, false);
+          const response = await this._asLite.playersStop(1);
+          this._statusCheck(response);
+        },
       },
       {
         instruction: "Please disconnect source from HDMI1 and connect to HDMI3",
       },
       {
+        id: "HDMI-T7",
         question: "Does only HDMI3 show as connected?",
-        preTest: this.connectHDMI3ToPlayer1.bind(this),
+        preTest: async () => {
+          const response = await this._asLite.playersWatchInput(1, "HDMI3");
+          this._statusCheck(response);
+          this._showPlayer(this._player1, true);
+        },
       },
       {
-        question: "Is the HDMI input visible full screen?",
+        id: "HDMI-T8",
+        question: "Is the HDMI3 input visible full screen?",
       },
       {
-        question: "Can you hear the audio from the HDMI input?",
+        id: "HDMI-T9",
+        question: "Can you hear the audio from the HDMI3 input?",
       },
       {
         instruction: "Please leave the source on HDMI3 and continue to play it",
       },
       {
+        id: "HDMI-T10",
         question: "Is the HDM3 input visible full screen?",
-        preTest: this.switchHDMI3ToPlayer2.bind(this),
+        preTest: async () => {
+          this._showPlayer(this._player1, false);
+          let response = await this._asLite.playersStop(1);
+          this._statusCheck(response);
+
+          response = await this._asLite.playersWatchInput(2, "HDMI3");
+          this._statusCheck(response);
+          this._showPlayer(this._player2, true);
+        },
       },
       {
-        question: "Can you hear the audio from the HDMI input?",
+        id: "HDMI-T11",
+        question: "Can you hear the audio from the HDMI3 input?",
       },
       {
-        question: "Is the HDMI input no longer visible?",
-        preTest: this.stopPlayer2.bind(this),
+        id: "HDMI-T12",
+        question: "Is the HDMI3 input no longer visible?",
+        preTest: async () => {
+          this._showPlayer(this._player2, false);
+          const response = await this._asLite.playersStop(1);
+          this._statusCheck(response);
+        },
       },
       {
         instruction: "Please disconnect the 1080P60 source from HDMI3 and connect it to HDMI1 and play it",
-        preTest: this.setupDualPlayers.bind(this),
+        preTest: () => {
+          this._showPlayer(this._player1);
+          this._resizePlayer(this._player1, 0, 108, 1532, 862);
+          this._showPlayer(this._player2);
+          this._resizePlayer(this._player2, 0, 0, 1920, 1080);
+        },
       },
       {
+        id: "HDMI-T13",
         question: "Does only HDMI1 show as connected?",
-        preTest: this.connectHDMI1ToPlayer2.bind(this),
+        preTest: async () => {
+          const response = await this._asLite.playersWatchInput(2, "HDMI3");
+          this._statusCheck(response);
+          this._showPlayer(this._player1, true);
+        },
       },
       {
+        id: "HDMI-T14",
         question: "Is content playing overlayed on the input to HDMI1?",
-        preTest: this.playContentOnPlayer1.bind(this),
+        preTest: async () =>  {
+          this._resizePlayer(this._player1, 0, 108, 1532, 862);
+          const response = await this._asLite.playersWatchLive(1, "3000");
+          this._statusCheck(response);
+          this._showPlayer(this._player1, true);
+        },
       },
       {
+        instruction: "Use the left button to set the slider to the middle and press select",
+        preTest: async () => {
+          const balance = await this._asLite.getSystemSetting("sound.mixbias");
+          this.tag("AudioBalanceOverlay").setAudioBalance(balance);
+          this.tag("AudioBalanceOverlay").patch({ visible: true });
+          this._setState("TestState.BalanceTestState");
+        }
+      },
+      {
+        id: "HDMI-T15",
         question: "Can you hear the audio from the HDMI input?",
       },
       {
+        id: "HDMI-T16",
         question: "Can you hear the audio from the content?",
       },
       {
+        instruction: "Use the left button to set the slider to the far left and press select",
+        preTest: () => {
+          this._setState("TestState.BalanceTestState");
+        }
+      },
+      {
+        id: "HDMI-T17",
+        question: "Can you hear only the content audio?",
+      },
+      {
+        instruction: "Use the right button to set the slider to the far right and press select",
+        preTest: () => {
+          this._setState("TestState.BalanceTestState");
+        }
+      },
+      {
+        id: "HDMI-T18",
+        question: "Can you hear only the HDMI1 audio?",
+      },
+      {
+        instruction: "Use the left button to set the slider to the middle and press select",
+        preTest: () => {
+          this._setState("TestState.BalanceTestState");
+        }
+      },
+      {
+        id: "HDMI-T19",
+        question: "Can you hear both content and HDMI audio?",
+        preTest: () => {
+          this.tag("AudioBalanceOverlay").patch({ visible: false });
+        }
+      },
+      {
+        id: "HDMI-T20",
         question: "Do the volume controls change the volume of both the HDMI input and content?",
       },
       {
+        id: "HDMI_T21",
         question: "Does the content completely cover the HDMI input video?",
-        preTest: this.resizePlayer1FullScreen.bind(this),
+        preTest: () => {
+          this._showPlayer(this._player1, true);
+          this._resizePlayer(this._player1, 0, 0, 1920, 1080);
+        },
       },
       {
+        id: "HDMI-T22",
         question: "Can you STILL hear the audio from the HDMI input?",
       },
       {
+        id: "HDMI-T23",
         question: "Can you see only the HDMI input?",
-        preTest: this.stopPlayer1.bind(this),
+        preTest: async () => {
+          this._showPlayer(this._player1, false);
+          const response = await this._asLite.playersStop(1);
+          this._statusCheck(response);
+        },
       },
       {
+        id: "HDMI-T24",
         question: "Is content playing overlayed on the input to HDMI1?",
-        preTest: this.playContentOnPlayer1Test.bind(this),
+        preTest: async () =>  {
+          this._resizePlayer(this._player1, 0, 108, 1532, 862);
+          const response = await this._asLite.playersWatchLive(1, "3000");
+          this._statusCheck(response);
+          this._showPlayer(this._player1, true);
+        },
       },
       {
         instruction: "Tests complete",
-        preTest: this.stopAllPlayers.bind(this),
+        preTest: async () => {
+          this._showPlayer(this._player1, false);
+          this._showPlayer(this._player2, false);
+
+          let response = await this._asLite.playersStop(1);
+          this._statusCheck(response);
+          response = await this._asLite.playersStop(2);
+          this._statusCheck(response);
+        },
         done: true,
       }
     ];
@@ -362,12 +525,13 @@ export class HDMITest extends Lightning.Component {
   }
 
   _init() {
-    this._setState("TestState");
+    this._setState("TestState.DefaultTestState");
+    this._previousState = this._getState();
   }
 
   async _updateHDMIStates() {
     this._systemInputs = await this._asLite.getSystemInputs();
-    logger.debug(FILE_NAME, "systemInputs:", this.systemInputs);
+    logger.debug(FILE_NAME, "systemInputs:", this._systemInputs);
 
     this.hdmi1Port = this._systemInputs.inputs.find((input) => input.portid == "HDMI1").state;
     this.hdmi2Port = this._systemInputs.inputs.find((input) => input.portid == "HDMI2").state;
@@ -428,18 +592,28 @@ export class HDMITest extends Lightning.Component {
     this.fireAncestors("$showBackground", true);
   }
 
-  _updateTest(test) {
+  _handleBack() {
+    this.fireAncestors("$showBackground", true);
+    return false;
+  }
+
+  async _updateTest(test) {
     logger.debug(FILE_NAME, "test:", test);
 
+    this.idText = "";
     this.instructionText = "";
     this.questionText = "";
 
     if (test.preTest) {
       try {
-        test.preTest();
+        await test.preTest();
       } catch (e) {
         logger.error(FILE_NAME, "Pre test error:", e.message);
       }
+    }
+
+    if (test.id) {
+      this.idText = test.id;
     }
 
     if (test.instruction) {
@@ -451,124 +625,25 @@ export class HDMITest extends Lightning.Component {
     }
   }
 
-  _handleBack() {
-    this.fireAncestors("$showBackground", true);
-    return false;
-  }
-
   _showError(response) {
+    this._previousState = this._getState();
     this.errorStatus = `${response?.status} ${response?.statusText}`;
     this.errorMessage = `${response?.data?.errorCode} ${response?.data?.userMessage}`;
     this.developerMessage = response?.data?.developerMessage?.[0].reason0;
     this._setState("ErrorState");
   }
 
-  async connectHDMI1ToPlayer1() {
-    this._showPlayer(this._player1, true);
-    const response = await this._asLite.playersWatchInput(1, "HDMI1");
-
+  _statusCheck(response) {
     if (response.status != 200) {
       logger.error(FILE_NAME, "response:", response);
       this._showError(response);
     }
   }
 
-  async connectHDMI1ToPlayer2() {
-    this._showPlayer(this._player1, true);
-    const response = await this._asLite.playersWatchInput(2, "HDMI1");
+  async _onAudioBalanceControlChanged(value) {
+    logger.debug(FILE_NAME, "value:", value);
 
-    if (response.status != 200) {
-      logger.error(FILE_NAME, "response:", response);
-      this._showError(response);
-    }
-  }
-
-  async connectHDMI3ToPlayer1() {
-    this._showPlayer(this._player1, true);
-    const response = await this._asLite.playersWatchInput(1, "HDMI3");
-
-    if (response.status != 200) {
-      logger.error(FILE_NAME, "response:", response);
-      this._showError(response);
-    }
-  }
-
-  async switchHDMI3ToPlayer2() {
-    let response = await this._asLite.playersStop(1);
-
-    if (response.status != 200) {
-      logger.error(FILE_NAME, "response:", response);
-      this._showError(response);
-    }
-
-    this._showPlayer(this._player1, false);
-    this._showPlayer(this._player2, true);
-
-    response = await this._asLite.playersWatchInput(2, "HDMI3");
-
-    if (response.status != 200) {
-      logger.error(FILE_NAME, "response:", response);
-      this._showError(response);
-    }
-  }
-
-  async playContentOnPlayer1() {
-    this._showPlayer(this._player1, true);
-    const response = await this._asLite.playersWatchLive(1, "3000");
-
-    if (response.status != 200) {
-      logger.error(FILE_NAME, "response:", response);
-      this._showError(response);
-    }
-  }
-
-  async stopPlayer1() {
-    const response = await this._asLite.playersStop(1);
-
-    if (response.status != 200) {
-      logger.error(FILE_NAME, "response:", response);
-      this._showError(response);
-    }
-
-    this._showPlayer(this._player1, false);
-    }
-
-  async stopPlayer2() {
-    const response = await this._asLite.playersStop(2);
-
-    if (response.status != 200) {
-      logger.error(FILE_NAME, "response:", response);
-      this._showError(response);
-    }
-
-    this._showPlayer(this._player2, false);
-  }
-
-  async stopAllPlayers() {
-    await this.stopPlayer1();
-    await this.stopPlayer2();
-  }
-
-  setupDualPlayers() {
-    this._showPlayer(this._player1);
-    this._resizePlayer(this._player1, 0, 108, 1532, 862);
-    this._showPlayer(this._player2);
-    this._resizePlayer(this._player2, 0, 0, 1920, 1080);
-  }
-
-  resizePlayer1FullScreen() {
-    this._showPlayer(this._player1, true);
-    this._resizePlayer(this._player1, 0, 0, 1920, 1080);
-  }
-
-  async playContentOnPlayer1Test() {
-    this._showPlayer(this._player1, true);
-    this._resizePlayer(this._player1, 0, 108, 1532, 862);
-    const response = await this._asLite.playersWatchLive(1, "3000");
-
-    if (response.status != 200) {
-      logger.error(FILE_NAME, "response:", response);
-      this._showError(response);
-    }
+    const response = await this._asLite.setSystemSetting("sound.mixbias", value);
+    this._statusCheck(response);
   }
 }

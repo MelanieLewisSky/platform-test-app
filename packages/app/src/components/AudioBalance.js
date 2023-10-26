@@ -11,8 +11,9 @@ const SLIDER_WIDTH = 600;
 const SLIDER_MARGIN = 26;
 
 // const HEADING_WIDTH = WIDTH - PANEL_PADDING * 2;
-export default class AudioBalance extends Lightning.Component {
+export class AudioBalance extends Lightning.Component {
   static WIDTH = WIDTH;
+  static HEIGHT = HEIGHT;
 
   static _template() {
     return {
